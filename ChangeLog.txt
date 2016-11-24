@@ -1,0 +1,4 @@
+# HSBC web server changelog
+
+## 2015-11-24 0.1
+* Init project
