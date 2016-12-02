@@ -93,7 +93,7 @@ class DataService():
 
         return json.dumps(time_2_weather_record)
 
-    def find_closed_records(self, collection_name, time, time_attr='time'):
+    def get_closed_records(self, collection_name, time, time_attr='time'):
         """
         This function get the closed records of time
 
