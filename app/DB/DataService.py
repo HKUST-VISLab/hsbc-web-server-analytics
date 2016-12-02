@@ -2,10 +2,10 @@ import json
 import datetime
 from pymongo import MongoClient
 
-# Should included into the config file
+# Warning: Should included into the config file
 HOST = "127.0.0.1"
 PORT = 27017
-
+DB = "hk_weather_data"
 # Warning, all the collection should be read from the configure files
 
 
@@ -15,8 +15,8 @@ class DataService():
     """
     def __init__(self):
         # Warning, need to read from config
-        self.__client = MongoClient('localhost', 27017)
-        self.__db = self.__client['hk_weather_data']
+        self.__client = MongoClient(HOST, PORT)
+        self.__db = self.__client[DB]
 
 
     def get_station_config(self):
