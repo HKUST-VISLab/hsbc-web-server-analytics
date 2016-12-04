@@ -19,6 +19,8 @@ def getStationConfig():
     :return: the stationconfig file(json format)
     """
     return data_service.get_station_config()
+
+
 @app.route('/getWeatherInTimeRange', methods=['POST'])
 def getWeatherInTimeRange():
     post_data = json.loads(request.data.decode())
@@ -34,7 +36,7 @@ def getWeatherInTimeRange():
 
 @app.route('/getRecentWeather', methods=['POST'])
 def getCurrentWeather():
-    return data_service.get_closed_records("current_weather")
+    return data_service.get_recent_records("current_weather")
 
 @app.route('/getClosedWeather', methods=['POST'])
 def getClosedWeather():

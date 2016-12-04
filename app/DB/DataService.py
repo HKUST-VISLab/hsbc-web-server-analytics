@@ -93,7 +93,7 @@ class DataService():
 
         return json.dumps(time_2_weather_record)
 
-    def get_closed_records(self, collection_name, time, time_attr='time'):
+    def get_closed_records(self, collection_name, time_str, time_attr='time'):
         """
         This function get the closed records of time
 
@@ -102,18 +102,18 @@ class DataService():
         :param time_attr: the attributes which record time
         :return: {time: time, records:[]}
         """
-        time = correct_time_format(time)
-        if time == False:
+        time_str = correct_time_format(time_str)
+        if time_str == False:
             print('Time format is incorrect!')
             return {}
 
         #  Warning should be revised by unifying all the time format
         if(collection_name == "forecast_weather"):
-            time = int(time)
+            time_str = int(time_str)
         # End warning
 
         weather_collection = self.__db[collection_name]
-        closest_below_records = weather_collection.find({"time": {"$lte": time}}).sort(time_attr, -1)
+        closest_below_records = weather_collection.find({"time": {"$lte": time_str}}).sort(time_attr, -1)
 
         records = []
         closest_time = None
@@ -133,7 +133,7 @@ class DataService():
         print('To the start!')
         return {}
 
-    def find_recent_records(self, collection_name):
+    def get_recent_records(self, collection_name):
         """
         This function get the latest records in the collection
         :param collection_name: the name of the collection
@@ -141,7 +141,8 @@ class DataService():
         """
         now_time = datetime.datetime.now()
         query_time_string = now_time.strftime("%Y%m%d%H%M%S")
-        return self.find_closed_records(collection_name, query_time_string)
+        print(query_time_string)
+        return self.get_closed_records(collection_name, query_time_string)
 
 
 # Warning: shoule be put into a lib module
@@ -156,11 +157,11 @@ def correct_time_format(time):
     if len(time) < 14:
         time = str(time)
         time += "0" * (14 - len(time))
-        return time
+    return time
 
 
 
-# Warning: shoule be put into a lib module
+# Warning: should be put into a lib module
 
 def isfloat(value):
     try:
@@ -179,6 +180,6 @@ if __name__ == '__main__':
     # current_weather forecast_weather
     # result = data_service.find_closed_records('forecast_weather',"201611302215")
     # print(data_service.find_recent_records('current_weather'))
-    print(data_service.get_weather_by_range('forecast_weather', [start_time, end_time]))
+    # print(data_service.get_weather_by_range('forecast_weather', [start_time, end_time]))
     # print(result)
-    # data_service.get_recent_weather([start_time, end_time])
+    print(data_service.get_station_config())
