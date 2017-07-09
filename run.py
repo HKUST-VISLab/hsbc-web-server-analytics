@@ -1,4 +1,4 @@
 from app import app
 
 # The port number should be the same as the front end
-app.run(debug=True)
+app.run(debug=True, port=6000)

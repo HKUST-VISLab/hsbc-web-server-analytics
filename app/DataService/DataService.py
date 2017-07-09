@@ -4,7 +4,8 @@ from pymongo import MongoClient
 from app.DataService.Config import *
 import time
 from app.lib.lib import calc_pearsonr
-from app.lib.lib import corr
+from app.lib.lib import calc_rel_diff
+from app.lib.lib import calc_abs_diff
 # Warning: Should included into the config file
 
 # Warning, all the collection should be read from the configure files
@@ -40,15 +41,18 @@ class DataService():
         self.aqi_stations_collection = self.__station_db[AQISTATIONCOLLECTION]
 
         station_list = []
-        for station in self.aqi_stations_collection.find():
-            station_list.append({'station_code': station['station_code'],
-                                 'loc': station['loc'],
-                                 'type': 'aqi'})
 
         for station in self.weather_stations_collection.find():
             station_list.append({'station_code': station['station_code'],
                                  'loc': station['loc'],
                                  'type': 'weather'})
+
+
+        for station in self.aqi_stations_collection.find():
+            station_list.append({'station_code': station['station_code'],
+                                 'loc': station['loc'],
+                                 'type': 'aqi'})
+
 
         return station_list
 
@@ -59,7 +63,7 @@ class DataService():
         pass
 
     @calc_time
-    def get_records_from_time_range(self, station_id = "CB_R", start_time = None, end_time = None, hour_range = 3, data_attr = "PM2_5"):
+    def get_records_from_time_range(self, station_id = "CB_R", hour_range = 3, data_attr = "PM2_5", metric = "CorrCoefficient" , start_time = None, end_time = None):
         """
 
         :param station_id:
@@ -72,6 +76,13 @@ class DataService():
         aqi_collection = aqi_db[AQICOLLECTION]
         data_list = []
         previous_agg = None
+        measure_diff = None
+        if metric == "CorrCoefficient":
+            measure_diff = calc_pearsonr
+        elif metric == "RelError":
+            measure_diff = calc_rel_diff
+        elif metric == "AbsError":
+            measure_diff = calc_abs_diff
         if start_time == None and end_time == None:
             for record in aqi_collection.find({'station_code': station_id}).sort('time', 1):
                 current_agg = self.__generate_agg(record, data_attr, hour_range)
@@ -79,7 +90,7 @@ class DataService():
                 if sign == True:
                     previous_agg = _agg
                     data_list.append(_agg)
-        del _agg["struct_time"]
+
 
         for agg in data_list:
             aqi_values = agg['data']
@@ -88,9 +99,11 @@ class DataService():
             for model in models:
                 values = [float(aqi_value[model]) if aqi_value[model] != None else None for aqi_value in aqi_values]
                 model_values.append(values)
-                if "corr" not in agg:
-                    agg["corr"] = {}
-                agg["corr"][model] = list(calc_pearsonr(obs_values, values))
+                if "diff" not in agg:
+                    agg["diff"] = {}
+                r = list(measure_diff(obs_values, values))
+                agg['diff'][model] = r
+
         return data_list
 
 
@@ -133,7 +146,7 @@ class DataService():
 
 # Warning: shoule be put into a lib module
 def correct_time_format(time):
-    if not isfloat(time) :
+    if not isfloat(time):
         return False
     try:
         time = str(time)
@@ -158,6 +171,11 @@ def isfloat(value):
 
 if __name__ == '__main__':
     data_service = DataService()
-    data_service.get_records_from_time_range(hour_range=6)
+    result = data_service.get_records_from_time_range(hour_range=6)
+    import json
+    with open('data.json', 'w') as output:
+        json.dump(result, output)
+    # print(result)
+
 
 

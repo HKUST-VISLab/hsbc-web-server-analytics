@@ -30,12 +30,15 @@ def getRecordOfStations():
     end_time = post_data['end_time']
     aqi_attr = post_data['attr']
     hour_range = post_data['hour_range']
+    metric = post_data['metric']
+    print('query', station_id, hour_range, metric, aqi_attr, start_time, end_time)
     query_result = data_service.get_records_from_time_range(
         station_id=station_id,
         start_time=start_time,
         end_time=end_time,
         data_attr=aqi_attr,
-        hour_range=hour_range
+        hour_range=hour_range,
+        metric=metric
     )
     return json.dumps(query_result)
 

@@ -46,14 +46,55 @@ def calc_pearsonr(arr1 ,arr2):
             continue
         arr_no_none1.append(arr1[index])
         arr_no_none2.append(arr2[index])
-    if len(arr_no_none1) == 1 or len(arr_no_none1) == 0:
-        return False, False
 
+    if len(arr_no_none1) <= 1 or len(arr_no_none2) <= 1:
+        return False, False
+    # print(arr_no_none1, arr_no_none2)
     return pearsonr(arr_no_none1, arr_no_none2)
 
+
+def calc_rel_diff(obsList, predList):
+    if len(obsList) != len(predList):
+        return False
+
+    arr_no_none1 = []
+    arr_no_none2 = []
+    for index in range(len(obsList)):
+        if obsList[index] == None or predList[index] == None:
+            continue
+        arr_no_none1.append(obsList[index])
+        arr_no_none2.append(predList[index])
+
+    abs_diff = sum([abs(arr_no_none1[i] - arr_no_none2[i]) for i in range(len(arr_no_none2))])
+    if len(arr_no_none2) == 0:
+        return None, None
+    avg_abs_diff = abs_diff / len(arr_no_none1)
+    rel_diff = abs_diff / sum(arr_no_none1)
+
+    return rel_diff, avg_abs_diff
+
+def calc_abs_diff(obsList, predList):
+    # hahaha
+    if len(obsList) != len(predList):
+        return False
+
+    arr_no_none1 = []
+    arr_no_none2 = []
+    for index in range(len(obsList)):
+        if obsList[index] == None or predList[index] == None:
+            continue
+        arr_no_none1.append(obsList[index])
+        arr_no_none2.append(predList[index])
+
+    abs_diff = sum([abs(arr_no_none1[i] - arr_no_none2[i]) for i in range(len(arr_no_none2))])
+    if len(arr_no_none2) == 0:
+        return None, None
+    avg_abs_diff = abs_diff / len(arr_no_none1)
+    rel_diff = abs_diff / sum(arr_no_none1)
+
+    return avg_abs_diff, rel_diff
 if __name__ == '__main__':
-    A, B = [1, 2, 4, 4], [0.1,0.22,0.112,0.4]
-    result = calc_pearsonr(A, B)
-    print(result)
+    A, B = [1, 2, None, 4], [1, 2, 7, 4]
+
     # print(None in [1,2,3,4,None])
     # print(corr(A, B))
