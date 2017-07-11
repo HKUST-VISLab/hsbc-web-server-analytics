@@ -17,6 +17,7 @@ def getStationConfig():
     """This is a function to return the station configuration data
     :return: the stationconfig file(json format)
     """
+    print('herex')
     data = data_service.get_stations()
     return json.dumps(data)
 

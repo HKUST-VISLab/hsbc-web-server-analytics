@@ -103,7 +103,9 @@ class DataService():
                     agg["diff"] = {}
                 r = list(measure_diff(obs_values, values))
                 agg['diff'][model] = r
-
+        for agg in data_list:
+            if "struct_time" in agg:
+                del agg["struct_time"]
         return data_list
 
 
