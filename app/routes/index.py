@@ -2,8 +2,9 @@
 from app import app, mongo
 import json
 from flask import request
-
+from flask import send_file
 from app.DataService.DataService import DataService
+import os.path
 
 data_service = DataService()
 print('here')
@@ -17,7 +18,7 @@ def getStationConfig():
     """This is a function to return the station configuration data
     :return: the stationconfig file(json format)
     """
-    print('herex')
+
     data = data_service.get_stations()
     return json.dumps(data)
 
@@ -42,6 +43,23 @@ def getRecordOfStations():
         metric=metric
     )
     return json.dumps(query_result)
+
+
+@app.route('/get_aq_station_img', methods=['GET', 'POST'])
+def getImages():
+    station_code = request.args.get('station_code')
+    img_name = 'aq_' + station_code + '.jpg'
+    current_path = os.path.dirname(os.path.abspath(__file__))
+    img_folder = os.path.join(current_path, '../../img')
+    file_path = os.path.join(img_folder, img_name)
+
+    print('getImages',file_path, os.path.isfile(file_path) )
+
+    if os.path.isfile(file_path) == False:
+        file_path = '../img/' + 'not_found' + '.jpg'
+
+    return send_file(file_path, mimetype='image/gif')
+
 
 if __name__ == '__main__':
     with open('../../test_data/'+'full_station_config.json', 'r') as rf:

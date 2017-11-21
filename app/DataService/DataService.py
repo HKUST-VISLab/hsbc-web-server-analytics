@@ -1,5 +1,6 @@
 import json
 import datetime
+import pymongo
 from pymongo import MongoClient
 from app.DataService.Config import *
 import time
@@ -28,6 +29,10 @@ class DataService():
         self.__client = MongoClient(HOST, PORT)
         self.stations = self.__read_stations()
 
+    def get_station(self):
+        return self.__read_stations()
+
+
     @calc_time
     def __read_stations(self):
         """
@@ -49,8 +54,11 @@ class DataService():
 
 
         for station in self.aqi_stations_collection.find():
+            station_code = station['station_code']
+            recent_record = self.get_recent_record(station_code)
             station_list.append({'station_code': station['station_code'],
                                  'loc': station['loc'],
+                                 'recent': recent_record,
                                  'type': 'aqi'})
 
 
@@ -73,7 +81,8 @@ class DataService():
         :return:
         """
         aqi_db = self.__client[AQIDB]
-        aqi_collection = aqi_db[AQICOLLECTION]
+        # aqi_collection = aqi_db[AQICOLLECTION]
+        aqi_collection = aqi_db['dev_aqi_prediction_aggregation_hkust']
         data_list = []
         previous_agg = None
         measure_diff = None
@@ -108,6 +117,15 @@ class DataService():
                 del agg["struct_time"]
         return data_list
 
+    def get_recent_record(self, station_id="CB_R"):
+        aqi_db = self.__client[AQIDB]
+        aqi_collection = aqi_db[AQICOLLECTION]
+        r_agg = aqi_collection.find({'station_code': station_id}).sort('time', pymongo.DESCENDING).limit(1)
+        r_agg = list(r_agg)
+        if len(r_agg) != 0:
+            del r_agg[0]['_id']
+            return r_agg[0]
+        return None
 
     def __generate_agg(self, record, data_attr = "PM2_5", hour_range = 3):
         timestamp = record["time"]
@@ -173,10 +191,12 @@ def isfloat(value):
 
 if __name__ == '__main__':
     data_service = DataService()
-    result = data_service.get_records_from_time_range(hour_range=6)
-    import json
-    with open('data.json', 'w') as output:
-        json.dump(result, output)
+    station_records = data_service.get_recent_record()
+    print(station_records)
+    # result = data_service.get_records_from_time_range(hour_range=6)
+    # import json
+    # with open('data.json', 'w') as output:
+    #     json.dump(result, output)
     # print(result)
 
 
