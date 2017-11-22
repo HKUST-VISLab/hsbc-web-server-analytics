@@ -47,6 +47,7 @@ def getRecordOfStations():
 
 @app.route('/get_aq_station_img', methods=['GET', 'POST'])
 def getImages():
+    print('get images');
     station_code = request.args.get('station_code')
     img_name = 'aq_' + station_code + '.jpg'
     current_path = os.path.dirname(os.path.abspath(__file__))
