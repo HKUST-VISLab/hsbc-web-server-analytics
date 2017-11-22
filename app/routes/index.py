@@ -25,7 +25,7 @@ def getStationConfig():
 
 @app.route('/getallrecordsofstation', methods=['POST'])
 def getRecordOfStations():
-
+    print('get record of stations')
     post_data = json.loads(request.data.decode())
     station_id = post_data['stationId']
     start_time = post_data['start_time']
@@ -45,7 +45,7 @@ def getRecordOfStations():
     return json.dumps(query_result)
 
 
-@app.route('/get_aq_station_img', methods=['GET', 'POST'])
+@app.route('/get_aq_station_img', methods=['POST'])
 def getImages():
     print('get images');
     station_code = request.args.get('station_code')
