@@ -18,14 +18,14 @@ def getStationConfig():
     """This is a function to return the station configuration data
     :return: the stationconfig file(json format)
     """
-
+    print('stationConfig')
     data = data_service.get_stations()
     return json.dumps(data)
 
 
 @app.route('/getallrecordsofstation', methods=['POST'])
 def getRecordOfStations():
-    print('get record of stations')
+    print('getallrecordsofstation')
     post_data = json.loads(request.data.decode())
     station_id = post_data['stationId']
     start_time = post_data['start_time']
